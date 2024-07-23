@@ -138,6 +138,7 @@ fun ShoppingListApp() {
             text = {
                 Column {
                     OutlinedTextField(
+                        label = {Text(  "Enter Item")},
                         value = itemName,
                         onValueChange = {itemName = it},
                         singleLine = true,
@@ -146,6 +147,7 @@ fun ShoppingListApp() {
                             .padding(8.dp)
                     )
                     OutlinedTextField(
+                        label = {Text(  "Enter Quantity")},
                         value = itemQuantity,
                         onValueChange = {itemQuantity = it},
                         singleLine = true,
