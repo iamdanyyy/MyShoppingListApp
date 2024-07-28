@@ -41,18 +41,14 @@ data class ShoppingItem(
 )
 
 @Composable
-fun ShoppingListApp() {
-    var sItems by remember{ mutableStateOf(listOf<ShoppingItem>()) }
-    var showDialog by remember{ mutableStateOf(false)  }
-    var itemName by remember{ mutableStateOf("") }
-    var itemQuantity by remember { mutableStateOf("") }
+fun ShoppingListApp(viewModel: CounterViewModel) {
 
     Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center
     ) {
         Button(
-            onClick = { showDialog = true },
+            onClick = { viewModel.showDialog.value = true },
             modifier = Modifier.align(Alignment.CenterHorizontally)
         ) {
             Text(text = "Add Item")
@@ -62,19 +58,19 @@ fun ShoppingListApp() {
                 .fillMaxSize()
                 .padding(16.dp)
         ){
-            items(sItems) {
+            items(viewModel.sItems.value) {
                 item ->
                 if (item.isEditing) {
                     ShoppingItemEditor(
                         item = item,
                         onEditComplete = {
                                          editedName,
-                                         editedQuantity -> sItems = sItems.map {
+                                         editedQuantity -> viewModel.sItems.value = viewModel.sItems.value.map {
                                              it.copy(
                                                  isEditing = false
                                              )
                                          }
-                            val editedItem = sItems.find { it.id == item.id }
+                            val editedItem = viewModel.sItems.value.find { it.id == item.id }
                             editedItem?.let {
                                 it.name = editedName
                                 it.quantity = editedQuantity
@@ -85,12 +81,12 @@ fun ShoppingListApp() {
                     ShoppingListItem(
                         item = item,
                         onEditClick = {
-                            sItems = sItems.map {
+                            viewModel.sItems.value = viewModel.sItems.value.map {
                                 it.copy(isEditing = it.id == item.id)
                             }
                         },
                         onDeleteClick = {
-                            sItems -= item
+                            viewModel.sItems.value -= item
                         }
                     )
                 }
@@ -98,7 +94,7 @@ fun ShoppingListApp() {
         }
     }
     
-    if (showDialog) {
+    if (viewModel.showDialog.value) {
         AlertDialog(
             modifier = Modifier
                 .fillMaxWidth()
@@ -113,23 +109,23 @@ fun ShoppingListApp() {
                 ) {
                     Button(
                         onClick = {
-                            if (itemName.isNotBlank()) {
+                            if (viewModel.itemName.value.isNotBlank()) {
                                 val newItem = ShoppingItem(
-                                    id = sItems.size + 1,
-                                    name = itemName,
-                                    quantity = itemQuantity.toInt(),
+                                    id = viewModel.sItems.value.size + 1,
+                                    name = viewModel.itemName.value,
+                                    quantity = viewModel.itemQuantity.value.toInt(),
                                     isEditing = false
                                 )
-                                sItems += newItem
-                                showDialog = false
-                                itemName = ""
-                                itemQuantity = ""
+                                viewModel.sItems.value += newItem
+                                viewModel.showDialog.value = false
+                                viewModel.itemName.value = ""
+                                viewModel.itemQuantity.value = ""
                             }
                         }
                     ) {
                         Text(text = "Add")
                     }
-                    Button(onClick = { showDialog = false }) {
+                    Button(onClick = { viewModel.showDialog.value = false }) {
                         Text(text = "Cancel")
                     }
                 }
@@ -139,8 +135,8 @@ fun ShoppingListApp() {
                 Column {
                     OutlinedTextField(
                         label = {Text(  "Enter Item")},
-                        value = itemName,
-                        onValueChange = {itemName = it},
+                        value = viewModel.itemName.value,
+                        onValueChange = {viewModel.itemName.value = it},
                         singleLine = true,
                         modifier = Modifier
                             .fillMaxWidth()
@@ -148,8 +144,8 @@ fun ShoppingListApp() {
                     )
                     OutlinedTextField(
                         label = {Text(  "Enter Quantity")},
-                        value = itemQuantity,
-                        onValueChange = {itemQuantity = it},
+                        value = viewModel.itemQuantity.value,
+                        onValueChange = {viewModel.itemQuantity.value = it},
                         singleLine = true,
                         modifier = Modifier
                             .fillMaxWidth()
